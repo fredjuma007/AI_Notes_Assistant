@@ -2,15 +2,17 @@
 import React from 'react'
 import { Dialog, DialogContent, DialogDescription, DialogHeader } from './ui/dialog'
 import { DialogTitle, DialogTrigger } from '@radix-ui/react-dialog'
-import { Plus } from 'lucide-react'
+import { Loader2, Plus } from 'lucide-react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
 import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
+import { useRouter } from 'next/navigation'
 
 type Props = {}
 
 const CreateNoteDialog = (props: Props) => {
+    const router = useRouter()
     const [input, setInput] = React.useState('');
     const createNoteBook = useMutation({
         mutationFn: async () => {
@@ -21,18 +23,20 @@ const CreateNoteDialog = (props: Props) => {
         }
     })
 
-    const habdleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (input ==='') {
             window.alert('Please enter a name for the notebook')
             return
         }
         createNoteBook.mutate(undefined, {
-            onSuccess: () => {
-                console.log('Notebook created')
+            onSuccess: ({ note_id }) => {
+                console.log("created new note:", { note_id });
+                router.push(`/notebook/${note_id}`);
             },
             onError: (error) => {
-                console.error(error)
+                console.error(error);
+                window.alert('Error creating notebook');
             }
         })
     };
@@ -58,15 +62,22 @@ const CreateNoteDialog = (props: Props) => {
                     click the button below to create a new not or cancel to go back
                 </DialogDescription>
             </DialogHeader>
-            <form onSubmit={habdleSubmit}>
+            <form onSubmit={handleSubmit}>
                 <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)} 
                 placeholder='Name...' />
                 <div className='h-4'></div>
                 <div className='flex item-center gap-2'>
-                    <Button type='reset' variant={'secondary'}>Cancel</Button>
-                    <Button className='bg-orange-600'>Create</Button>
+                    <Button type='reset' variant={'secondary'}>
+                        Cancel
+                    </Button>
+                    <Button className='bg-orange-600' disabled={createNoteBook.isPending}>
+                        {createNoteBook.isPending && (
+                            <Loader2 className='w-6 h-6 mr-2 animate-spin' />
+                        )}
+                        Create
+                    </Button>
                 </div>
             </form>
         </DialogContent>
