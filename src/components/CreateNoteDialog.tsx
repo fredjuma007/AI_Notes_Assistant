@@ -5,11 +5,38 @@ import { DialogTitle, DialogTrigger } from '@radix-ui/react-dialog'
 import { Plus } from 'lucide-react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
+import { useMutation } from '@tanstack/react-query'
+import axios from 'axios'
 
 type Props = {}
 
 const CreateNoteDialog = (props: Props) => {
-    const [input, setInput] = React.useState('')
+    const [input, setInput] = React.useState('');
+    const createNoteBook = useMutation({
+        mutationFn: async () => {
+            const response = await axios.post('/api/createNoteBook', {
+                name: input
+            })
+            return response.data
+        }
+    })
+
+    const habdleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        if (input ==='') {
+            window.alert('Please enter a name for the notebook')
+            return
+        }
+        createNoteBook.mutate(undefined, {
+            onSuccess: () => {
+                console.log('Notebook created')
+            },
+            onError: (error) => {
+                console.error(error)
+            }
+        })
+    };
+
   return (
     <Dialog>
         <DialogTrigger>
@@ -31,7 +58,7 @@ const CreateNoteDialog = (props: Props) => {
                     click the button below to create a new not or cancel to go back
                 </DialogDescription>
             </DialogHeader>
-            <form>
+            <form onSubmit={habdleSubmit}>
                 <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)} 
