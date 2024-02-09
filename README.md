@@ -6,8 +6,26 @@ THE INTERFACE ⬇️⬇️⬇️
 support the developer by buying me a coffee ☕ at https://www.buymeacoffee.com/fredjuma
 
 ## to run the code locally
+First, clone the repository:
 
-First, run the development server:
+```bash
+git clone
+```
+
+Then, install the dependencies:
+
+```bash
+npm install
+# or
+yarn
+# or
+pnpm
+# or
+bun
+```
+
+Finally,
+Then run the development server:
 
 ```bash
 npm run dev
